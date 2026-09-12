@@ -1,0 +1,158 @@
+/* ===== 全局颜色配置 ===== */
+/* 此文件定义了所有 CSS 自定义属性 (CSS Variables)，供整个应用使用 */
+/* 导入方式: 在 main.jsx 中 `import './styles/colors.css'` */
+
+/* ===== 基础色板 ===== */
+:root,
+[data-theme="light"] {
+  /* --- 主色 (琥珀/黄) --- */
+  --primary: #f59e0b;
+  --primary-light: #fbbf24;
+  --primary-lighter: #fde68a;
+  --primary-bg: #fffbeb;
+
+  /* --- 强调色：蓝 --- */
+  --accent-blue: #7dd3fc;
+  --accent-blue-light: #bae6fd;
+  --accent-blue-lighter: #e0f2fe;
+
+  /* --- 强调色：粉 --- */
+  --accent-pink: #f9a8d4;
+
+  /* --- 背景 --- */
+  --bg: #fffbeb;
+  --bg-card: rgba(255, 255, 255, 0.85);
+  --bg-card-hover: rgba(255, 255, 255, 0.95);
+  --bg-overlay: rgba(255, 251, 235, 0.7);
+
+  /* --- 文字 --- */
+  --text: #4a3728;
+  --text-secondary: #78716c;
+  --text-muted: #a8a29e;
+
+  /* --- 边框 --- */
+  --border: rgba(245, 158, 11, 0.2);
+  --border-hover: rgba(245, 158, 11, 0.5);
+
+  /* --- 阴影 --- */
+  --shadow: 0 4px 24px rgba(245, 158, 11, 0.12);
+  --shadow-hover: 0 8px 32px rgba(245, 158, 11, 0.2);
+
+  /* --- 标签 --- */
+  --tag-bg: rgba(245, 158, 11, 0.1);
+  --tag-text: #b45309;
+
+  /* --- 渐变 --- */
+  --gradient-1: linear-gradient(135deg, #fbbf24, #f59e0b);
+  --gradient-2: linear-gradient(135deg, #fde68a, #fbbf24);
+  --gradient-3: linear-gradient(135deg, #7dd3fc, #fbbf24);
+  --gradient-tab: linear-gradient(135deg, #7dd3fc, #f59e0b);
+
+  /* --- 卡片 --- */
+  --card-backdrop: blur(16px) saturate(180%);
+
+  /* --- 纯色 --- */
+  --color-white: #ffffff;
+
+  /* --- 粒子相关 --- */
+  --particle-colors: #fbbf24, #f59e0b, #fcd34d, #7dd3fc, #fde68a;
+  --particle-link-color: #fbbf24;
+
+  /* --- GitHub 日历 --- */
+  --github-calendar-light: #ebedf0, #fef3c7, #fde68a, #fbbf24, #f59e0b;
+  --github-calendar-dark: #161b22, #451a03, #92400e, #d97706, #fbbf24;
+
+  /* --- 名牌渐变背景 (动画用) --- */
+  --name-gradient: linear-gradient(90deg,
+    #7dd3fc 0%, #38bdf8 25%, #fbbf24 50%, #f59e0b 75%, #7dd3fc 100%);
+
+  /* --- Tab 指示器光斑 --- */
+  --tab-indicator-bg:
+    radial-gradient(circle at 30% 50%, #7dd3fc 0%, transparent 55%),
+    radial-gradient(circle at 70% 40%, #fbbf24 0%, transparent 55%),
+    radial-gradient(circle at 50% 70%, #38bdf8 0%, transparent 50%),
+    radial-gradient(circle at 40% 30%, #f59e0b 0%, transparent 50%),
+    radial-gradient(circle at 60% 60%, #7dd3fc 0%, transparent 60%);
+
+  /* --- 卡片悬停光斑 (黄色系，无规则混合，静态) --- */
+  --card-hover-bg:
+    radial-gradient(circle at 25% 45%, #fde68a33 0%, transparent 50%),
+    radial-gradient(circle at 70% 35%, #fbbf2433 0%, transparent 55%),
+    radial-gradient(circle at 45% 70%, #fcd34d33 0%, transparent 45%),
+    radial-gradient(circle at 65% 55%, #fef3c733 0%, transparent 50%),
+    radial-gradient(circle at 35% 65%, #f59e0b33 0%, transparent 55%);
+
+  /* --- 光泽扫过效果 --- */
+  --shimmer-gradient: linear-gradient(
+    120deg,
+    transparent 0%,
+    transparent 30%,
+    rgba(255, 251, 235, 0.25) 45%,
+    rgba(255, 255, 255, 1) 50%,
+    rgba(255, 251, 235, 0.25) 55%,
+    transparent 70%,
+    transparent 100%
+  );
+}
+
+/* ===== 暗色主题 ===== */
+[data-theme="dark"] {
+  --primary: #fbbf24;
+  --primary-light: #f59e0b;
+  --primary-lighter: #b45309;
+  --primary-bg: #1c1917;
+  --accent-blue: #38bdf8;
+  --accent-blue-light: #7dd3fc;
+  --accent-blue-lighter: #1e3a5f;
+  --accent-pink: #f472b6;
+  --bg: #1c1917;
+  --bg-card: rgba(41, 37, 36, 0.85);
+  --bg-card-hover: rgba(41, 37, 36, 0.95);
+  --bg-overlay: rgba(28, 25, 23, 0.7);
+  --text: #e7e5e4;
+  --text-secondary: #a8a29e;
+  --text-muted: #78716c;
+  --border: rgba(245, 158, 11, 0.15);
+  --border-hover: rgba(245, 158, 11, 0.4);
+  --shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+  --shadow-hover: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --tag-bg: rgba(245, 158, 11, 0.15);
+  --tag-text: #fbbf24;
+  --gradient-1: linear-gradient(135deg, #fbbf24, #f59e0b);
+  --gradient-2: linear-gradient(135deg, #fde68a, #fbbf24);
+  --gradient-3: linear-gradient(135deg, #7dd3fc, #fbbf24);
+  --gradient-tab: linear-gradient(135deg, #7dd3fc, #f59e0b);
+  --card-backdrop: blur(16px) saturate(120%);
+  --color-white: #ffffff;
+  --particle-colors: #fbbf24, #f59e0b, #fcd34d, #7dd3fc, #fde68a;
+  --particle-link-color: #fbbf24;
+  --github-calendar-light: #ebedf0, #fef3c7, #fde68a, #fbbf24, #f59e0b;
+  --github-calendar-dark: #161b22, #451a03, #92400e, #d97706, #fbbf24;
+  --name-gradient: linear-gradient(90deg,
+    #7dd3fc 0%, #38bdf8 25%, #fbbf24 50%, #f59e0b 75%, #7dd3fc 100%);
+  --tab-indicator-bg:
+    radial-gradient(circle at 30% 50%, #7dd3fc 0%, transparent 55%),
+    radial-gradient(circle at 70% 40%, #fbbf24 0%, transparent 55%),
+    radial-gradient(circle at 50% 70%, #38bdf8 0%, transparent 50%),
+    radial-gradient(circle at 40% 30%, #f59e0b 0%, transparent 50%),
+    radial-gradient(circle at 60% 60%, #7dd3fc 0%, transparent 60%);
+
+  /* --- 卡片悬停光斑 (黄色系，无规则混合，静态，暗色模式降低透明度) --- */
+  --card-hover-bg:
+    radial-gradient(circle at 25% 45%, #fde68a26 0%, transparent 50%),
+    radial-gradient(circle at 70% 35%, #fbbf2426 0%, transparent 55%),
+    radial-gradient(circle at 45% 70%, #fcd34d26 0%, transparent 45%),
+    radial-gradient(circle at 65% 55%, #fef3c726 0%, transparent 50%),
+    radial-gradient(circle at 35% 65%, #f59e0b26 0%, transparent 55%);
+
+  --shimmer-gradient: linear-gradient(
+    120deg,
+    transparent 0%,
+    transparent 30%,
+    rgba(255, 251, 235, 0.25) 45%,
+    rgba(255, 255, 255, 1) 50%,
+    rgba(255, 251, 235, 0.25) 55%,
+    transparent 70%,
+    transparent 100%
+  );
+}

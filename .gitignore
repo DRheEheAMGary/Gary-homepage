@@ -1,0 +1,27 @@
+# 依赖与产物
+node_modules/
+dist/
+dist-ssr/
+vendor/
+
+# 缓存
+cache/*
+!cache/.gitignore
+
+# 日志
+logs
+*.log
+
+# 编辑器 / 系统
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# 本地配置
+*.local
