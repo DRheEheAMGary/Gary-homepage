@@ -1,5 +1,7 @@
 # 🏠 Gary 个人主页（PHP 版）
 
+**简体中文** | [English](README.en.md) | [日本語](README.ja.md)
+
 由 **DRheEheAM_Gary-Homepage**（React 19 + Vite）重构而来的 **PHP 服务端渲染** 版本。
 
 页面结构与交互在浏览器中与 React 版保持一致，但内容由 PHP 直接渲染，
