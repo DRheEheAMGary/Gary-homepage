@@ -54,13 +54,13 @@
     entries.forEach(function (entry) {
       const el = entry.target;
 
-      if (!entry.isIntersecting) {
-        el.classList.remove('entered');
+      // 手动（点击 tab）滚动期间：只隐藏非目标页面，目标页面在滚动到位后再入场
+      if (manual) {
+        if (el.id !== target) el.classList.remove('entered');
         return;
       }
 
-      // 手动滚动期间，非目标页面保持隐藏
-      if (manual && el.id !== target) {
+      if (!entry.isIntersecting) {
         el.classList.remove('entered');
         return;
       }
@@ -97,8 +97,11 @@
     return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
   }
   let scrollRAF = null;
-  function animateScroll(el, to, duration) {
-    if (!el) return;
+  function animateScroll(el, to, duration, onDone) {
+    if (!el) {
+      if (onDone) onDone();
+      return;
+    }
     duration = duration || SCROLL_DURATION;
 
     // 取消尚未结束的动画，避免多次点击时两个动画互相打架
@@ -109,7 +112,10 @@
 
     const start = el.scrollTop;
     const change = to - start;
-    if (Math.abs(change) < 1) return;
+    if (Math.abs(change) < 1) {
+      if (onDone) onDone();
+      return;
+    }
 
     // 动画期间关闭 snap 与原生 smooth，避免与逐帧滚动互相打架
     el.style.scrollSnapType = 'none';
@@ -126,22 +132,27 @@
         // 清空内联样式，恢复 CSS 里的 snap / smooth 设置
         el.style.scrollSnapType = '';
         el.style.scrollBehavior = '';
+        if (onDone) onDone();
       }
     }
     scrollRAF = requestAnimationFrame(frame);
   }
 
-  // 相对滚动容器计算位置
-  function scrollToSection(el) {
-    if (!el) return;
+  // 相对滚动容器计算位置；onDone 在滚动到位后触发
+  function scrollToSection(el, onDone) {
+    if (!el) {
+      if (onDone) onDone();
+      return;
+    }
     if (!container) {
       el.scrollIntoView({ behavior: 'smooth' });
+      if (onDone) setTimeout(onDone, 500);
       return;
     }
     const rect = el.getBoundingClientRect();
     const containerRect = container.getBoundingClientRect();
     const top = container.scrollTop + (rect.top - containerRect.top);
-    animateScroll(container, top);
+    animateScroll(container, top, SCROLL_DURATION, onDone);
   }
 
   // ==================== Tab 指示器 ====================
@@ -268,9 +279,12 @@
       target = id;
       setActive(id);
       clearTimeout(manualTimer);
-      reveal(el);
-      scrollToSection(el);
-      manualTimer = setTimeout(function () { manual = false; }, 900);
+      el.classList.remove('entered'); // 滚动期间先隐藏目标，到位后再入场
+      scrollToSection(el, function () {
+        reveal(el);        // 滚动到位后再播放入场动画
+        manual = false;
+      });
+      manualTimer = setTimeout(function () { manual = false; }, 1400); // 兜底
     });
   });
 
