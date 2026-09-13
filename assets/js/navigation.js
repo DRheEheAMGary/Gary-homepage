@@ -91,7 +91,47 @@
     });
   }
 
-  // 相对滚动容器计算位置，比 scrollIntoView 更可靠
+  // 自定义缓动滚动：比原生 smooth 更柔和、时长可控
+  const SCROLL_DURATION = 700;
+  function easeInOutCubic(t) {
+    return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  }
+  let scrollRAF = null;
+  function animateScroll(el, to, duration) {
+    if (!el) return;
+    duration = duration || SCROLL_DURATION;
+
+    // 取消尚未结束的动画，避免多次点击时两个动画互相打架
+    if (scrollRAF !== null) {
+      cancelAnimationFrame(scrollRAF);
+      scrollRAF = null;
+    }
+
+    const start = el.scrollTop;
+    const change = to - start;
+    if (Math.abs(change) < 1) return;
+
+    // 动画期间关闭 snap 与原生 smooth，避免与逐帧滚动互相打架
+    el.style.scrollSnapType = 'none';
+    el.style.scrollBehavior = 'auto';
+
+    const startTime = performance.now();
+    function frame(now) {
+      const t = Math.min(1, (now - startTime) / duration);
+      el.scrollTop = start + change * easeInOutCubic(t);
+      if (t < 1) {
+        scrollRAF = requestAnimationFrame(frame);
+      } else {
+        scrollRAF = null;
+        // 清空内联样式，恢复 CSS 里的 snap / smooth 设置
+        el.style.scrollSnapType = '';
+        el.style.scrollBehavior = '';
+      }
+    }
+    scrollRAF = requestAnimationFrame(frame);
+  }
+
+  // 相对滚动容器计算位置
   function scrollToSection(el) {
     if (!el) return;
     if (!container) {
@@ -101,7 +141,7 @@
     const rect = el.getBoundingClientRect();
     const containerRect = container.getBoundingClientRect();
     const top = container.scrollTop + (rect.top - containerRect.top);
-    container.scrollTo({ top: top, behavior: 'smooth' });
+    animateScroll(container, top);
   }
 
   // ==================== Tab 指示器 ====================
@@ -230,14 +270,14 @@
       clearTimeout(manualTimer);
       reveal(el);
       scrollToSection(el);
-      manualTimer = setTimeout(function () { manual = false; }, 800);
+      manualTimer = setTimeout(function () { manual = false; }, 900);
     });
   });
 
   // ==================== 回到顶部 ====================
   if (backToTop && container) {
     backToTop.addEventListener('click', function () {
-      container.scrollTo({ top: 0, behavior: 'smooth' });
+      animateScroll(container, 0);
     });
   }
 
