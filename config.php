@@ -29,6 +29,13 @@ define('SITE_NAME', 'DRheEheAM_Gary');
 define('SITE_SUBTITLE', '个人主页 | OIer & 二次元');
 define('SITE_URL', 'https://dreamgary.cn');
 
+// ==================== 头像覆盖（可选） ====================
+// 当 WordPress 头像插件返回的 avatar 不正确时，可按用户 ID 指定头像 URL。
+// 键为 WordPress 用户 ID，值为头像图片地址。
+define('AVATAR_OVERRIDES', [
+    1 => 'https://blog.dreamgary.cn/wp-content/uploads/avatars/avatar-1-1784859119.jpeg',
+]);
+
 // ==================== 资源 / 缓存 ====================
 define('CACHE_DIR', __DIR__ . '/cache');
 define('GITHUB_CACHE_TTL', 60 * 30); // GitHub 贡献图缓存 30 分钟

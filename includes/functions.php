@@ -213,18 +213,6 @@ function normalize_avatar($avatar) {
     return filter_var($avatar, FILTER_VALIDATE_URL) ? $avatar : null;
 }
 
-/** 是否为默认/无效的 Gravatar 头像 */
-function is_default_avatar($url) {
-    if (empty($url) || !is_string($url)) {
-        return true;
-    }
-    // gravatar 地址缺少邮箱 hash（形如 /avatar/?...）即为默认头像
-    if (preg_match('#^https?://[^/]*gravatar\.com/avatar/?(\?|$)#i', $url)) {
-        return true;
-    }
-    return false;
-}
-
 /**
  * 通过 token 拉取当前用户
  * @return array|null ['id','name','slug','avatar']
@@ -246,6 +234,14 @@ function fetch_current_user($token) {
 
     // 只使用当前用户自己的数据，绝不回退到 Cookie / 其它账号
     $avatar = !empty($slaAvatar) ? $slaAvatar : normalize_avatar($data['avatar_urls'] ?? null);
+
+    // 手动覆盖（当 WordPress 侧头像与站点实际显示不一致时，见 config.php 的 AVATAR_OVERRIDES）
+    if (defined('AVATAR_OVERRIDES') && is_array(AVATAR_OVERRIDES) && isset(AVATAR_OVERRIDES[(int) $data['id']])) {
+        $override = normalize_avatar(AVATAR_OVERRIDES[(int) $data['id']]);
+        if ($override) {
+            $avatar = $override;
+        }
+    }
 
     return [
         'id'     => $data['id'],
