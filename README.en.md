@@ -1,6 +1,8 @@
 # 🏠 Gary's Homepage (PHP Edition)
 
-[简体中文](README.md) | **English** | [日本語](README.ja.md)
+[简体中文](README.md) | [繁體中文](README.zh-Hant.md) | **English** | [日本語](README.ja.md)
+
+> Original project: [DRheEheAMGary/DRheEheAM_Gary-Homepage](https://github.com/DRheEheAMGary/DRheEheAM_Gary-Homepage)
 
 A **PHP server-side rendered** rebuild of **DRheEheAM_Gary-Homepage** (React 19 + Vite).
 

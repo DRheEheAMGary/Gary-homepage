@@ -1,6 +1,8 @@
 # 🏠 Gary 个人主页（PHP 版）
 
-**简体中文** | [English](README.en.md) | [日本語](README.ja.md)
+**简体中文** | [繁體中文](README.zh-Hant.md) | [English](README.en.md) | [日本語](README.ja.md)
+
+> 原项目：[DRheEheAMGary/DRheEheAM_Gary-Homepage](https://github.com/DRheEheAMGary/DRheEheAM_Gary-Homepage)
 
 由 **DRheEheAM_Gary-Homepage**（React 19 + Vite）重构而来的 **PHP 服务端渲染** 版本。
 

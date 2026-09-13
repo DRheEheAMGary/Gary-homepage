@@ -1,6 +1,8 @@
 # 🏠 Gary のホームページ（PHP 版）
 
-[简体中文](README.md) | [English](README.en.md) | **日本語**
+[简体中文](README.md) | [繁體中文](README.zh-Hant.md) | [English](README.en.md) | **日本語**
+
+> 元プロジェクト：[DRheEheAMGary/DRheEheAM_Gary-Homepage](https://github.com/DRheEheAMGary/DRheEheAM_Gary-Homepage)
 
 **DRheEheAM_Gary-Homepage**（React 19 + Vite）を **PHP サーバーサイドレンダリング** に
 リファクタリングしたバージョンです。
