@@ -26,7 +26,7 @@
     'links-grid', 'contact-cards', 'game-cards', 'character-grid',
     'tag-list', 'feed-list', 'auth-container', 'auth-form-side', 'auth-form'
   ];
-  const PER_ELEM_DELAY = 75;
+  const PER_ELEM_DELAY = 65;
 
   function prepareSection(el) {
     const pageEl = el.querySelector('.page');
@@ -94,7 +94,7 @@
   }
 
   // 自定义缓动滚动：比原生 smooth 更柔和、时长可控
-  const SCROLL_DURATION = 850;
+  const SCROLL_DURATION = 720;
   function easeInOutCubic(t) {
     return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
   }
@@ -299,11 +299,11 @@
   });
 
   // ==================== 滚轮吸附（自定义缓动，比原生 snap 更慢更柔和） ====================
-  const WHEEL_SNAP_DURATION = 1100;
+  const WHEEL_SNAP_DURATION = 950;
 
   // 时长随距离缩放：小距离不拖沓，整屏吸附更从容
   function wheelDuration(distance) {
-    return Math.max(500, Math.min(WHEEL_SNAP_DURATION, Math.round(distance * 1.3)));
+    return Math.max(420, Math.min(WHEEL_SNAP_DURATION, Math.round(distance * 1.1)));
   }
 
   function sectionIndexAtTop() {
