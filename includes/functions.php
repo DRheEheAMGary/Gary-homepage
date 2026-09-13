@@ -231,7 +231,8 @@ function fetch_current_user($token) {
 
     // 1) 首选：博客端 Gary Avatar API 插件按用户 ID 计算出的"实际生效头像"
     //    兼容 Simple Local Avatars / One User Avatar 等任意头像插件
-    list($avatarOk, $avatarData) = wp_request('GET', GARY_AVATAR_PATH, null, $token);
+    $avatarPath = defined('GARY_AVATAR_PATH') ? GARY_AVATAR_PATH : '/gary/v1/avatar';
+    list($avatarOk, $avatarData) = wp_request('GET', $avatarPath, null, $token);
     if ($avatarOk && !empty($avatarData['avatar'])) {
         $avatar = normalize_avatar($avatarData['avatar']);
     }
