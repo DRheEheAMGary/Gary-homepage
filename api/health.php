@@ -1,23 +1,40 @@
 <?php
 /**
- * 临时健康检查：诊断登录后页面是否因配置/网络问题报错
+ * 临时健康检查：诊断登录后头像取数链路
  * 请勿长期保留，排查完成后删除。
  */
 
 require __DIR__ . '/../includes/functions.php';
 
 $avatarPath = defined('GARY_AVATAR_PATH') ? GARY_AVATAR_PATH : '/gary/v1/avatar';
-list($pluginOk, , $pluginStatus) = wp_request('GET', $avatarPath, null, '');
+$out = [
+    'php_version' => PHP_VERSION,
+    'curl'        => function_exists('curl_init'),
+    'wp_base'     => WP_BASE,
+    'gary_avatar_defined' => defined('GARY_AVATAR_PATH'),
+    'logged_in'   => is_logged_in(),
+];
 
-json_out([
-    'php_version'            => PHP_VERSION,
-    'curl'                   => function_exists('curl_init'),
-    'wp_base'                => WP_BASE,
-    'gary_avatar_path'       => $avatarPath,
-    'gary_avatar_defined'    => defined('GARY_AVATAR_PATH'),
-    'avatar_overrides_def'   => defined('AVATAR_OVERRIDES'),
-    'normalize_avatar_exists'=> function_exists('normalize_avatar'),
-    'fetch_user_exists'      => function_exists('fetch_current_user'),
-    'plugin_status_no_token' => $pluginStatus,
-    'plugin_ok'              => $pluginOk,
-]);
+$token = current_token();
+if (!empty($token)) {
+    $out['token_present'] = true;
+
+    list($meOk, $me) = wp_request('GET', WP_USERS_ME_PATH, null, $token);
+    $out['me_ok']          = $meOk;
+    $out['me_id']          = $me['id'] ?? null;
+    $out['me_name']        = $me['name'] ?? null;
+    $out['me_avatar_urls'] = $me['avatar_urls'] ?? null;
+    $out['me_sla']         = $me['simple_local_avatar'] ?? null;
+
+    list($pOk, $pData, $pStatus) = wp_request('GET', $avatarPath, null, $token);
+    $out['plugin_ok']      = $pOk;
+    $out['plugin_status']  = $pStatus;
+    $out['plugin_body']    = $pData;
+    $out['plugin_avatar']  = $pData['avatar'] ?? null;
+    $out['plugin_avatar_normalized'] = normalize_avatar($pData['avatar'] ?? null);
+
+    $out['session_avatar'] = $_SESSION['gary_user']['avatar'] ?? null;
+    $out['chosen_avatar']  = fetch_current_user($token)['avatar'] ?? null;
+}
+
+json_out($out);
