@@ -31,6 +31,10 @@ define('SITE_NAME', 'DRheEheAM_Gary');
 define('SITE_SUBTITLE', '个人主页 | OIer & 二次元');
 define('SITE_URL', 'https://dreamgary.cn');
 
+// ==================== 博客用户页面 ====================
+define('BLOG_USER_URL', 'https://blog.dreamgary.cn/user/');           // 后接用户名
+define('BLOG_SETTINGS_URL', 'https://blog.dreamgary.cn/usersettings/');
+
 // ==================== 头像覆盖（可选） ====================
 // 当 WordPress 头像插件返回的 avatar 不正确时，可按用户 ID 指定头像 URL。
 // 键为 WordPress 用户 ID，值为头像图片地址。通常留空即可（优先使用 Gary Avatar API）。

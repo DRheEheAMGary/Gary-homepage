@@ -17,9 +17,19 @@ $activeTab = $activeTab ?? 'home';
 
   <div class="top-bar-right">
     <?php if ($user): ?>
+      <?php
+        $avatar = $user['avatar'] ?? null;
+        $profileSlug = !empty($user['slug']) ? $user['slug'] : ($user['name'] ?? '');
+        $profileUrl = rtrim(BLOG_USER_URL, '/') . '/' . rawurlencode($profileSlug);
+      ?>
       <div class="top-bar-user-wrap" id="user-wrap">
-        <div class="top-bar-login-btn top-bar-user-pill">
-          <?php $avatar = $user['avatar'] ?? null; ?>
+        <button
+          class="top-bar-login-btn top-bar-user-pill"
+          id="user-menu-btn"
+          type="button"
+          aria-haspopup="true"
+          aria-expanded="false"
+        >
           <?php if (!empty($avatar)): ?>
             <img
               src="<?= e($avatar) ?>"
@@ -34,14 +44,19 @@ $activeTab = $activeTab ?? 'home';
             <?= fa_icon('fa-user-circle') ?>
           <?php endif; ?>
           <?= e($user['name']) ?>
-          <button class="top-bar-logout-btn" id="logout-btn" title="退出登录"><?= fa_icon('fa-sign-out-alt') ?></button>
-        </div>
-        <div class="logout-confirm-bar" id="logout-confirm" hidden>
-          <span>确定退出？</span>
-          <div class="logout-confirm-actions">
-            <button class="logout-confirm-cancel" id="logout-cancel">取消</button>
-            <button class="logout-confirm-ok" id="logout-ok">确定</button>
-          </div>
+          <i class="fa-solid fa-chevron-down top-bar-user-caret"></i>
+        </button>
+
+        <div class="user-menu" id="user-menu" role="menu" hidden>
+          <a class="user-menu-item" role="menuitem" href="<?= e($profileUrl) ?>" target="_blank" rel="noopener noreferrer">
+            <?= fa_icon('fa-id-badge') ?><span>个人主页</span>
+          </a>
+          <a class="user-menu-item" role="menuitem" href="<?= e(BLOG_SETTINGS_URL) ?>" target="_blank" rel="noopener noreferrer">
+            <?= fa_icon('fa-gear') ?><span>个人设置</span>
+          </a>
+          <button class="user-menu-item user-menu-logout" role="menuitem" id="user-menu-logout" type="button">
+            <?= fa_icon('fa-sign-out-alt') ?><span>退出登录</span>
+          </button>
         </div>
       </div>
     <?php else: ?>

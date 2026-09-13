@@ -218,29 +218,43 @@
     window.addEventListener('resize', moveIndicator);
   }
 
-  // ==================== 退出登录 ====================
-  const logoutBtn = document.getElementById('logout-btn');
-  const confirmBar = document.getElementById('logout-confirm');
-  const cancelBtn = document.getElementById('logout-cancel');
-  const okBtn = document.getElementById('logout-ok');
+  // ==================== 用户悬浮菜单 + 退出登录 ====================
   const userWrap = document.getElementById('user-wrap');
+  const userMenuBtn = document.getElementById('user-menu-btn');
+  const userMenu = document.getElementById('user-menu');
+  const logoutItem = document.getElementById('user-menu-logout');
 
-  if (logoutBtn && confirmBar) {
-    logoutBtn.addEventListener('click', function (e) {
+  function closeUserMenu() {
+    if (userMenu) userMenu.hidden = true;
+    if (userWrap) userWrap.classList.remove('open');
+    if (userMenuBtn) userMenuBtn.setAttribute('aria-expanded', 'false');
+  }
+
+  function openUserMenu() {
+    if (userMenu) userMenu.hidden = false;
+    if (userWrap) userWrap.classList.add('open');
+    if (userMenuBtn) userMenuBtn.setAttribute('aria-expanded', 'true');
+  }
+
+  if (userMenuBtn && userMenu) {
+    userMenuBtn.addEventListener('click', function (e) {
       e.stopPropagation();
-      confirmBar.hidden = false;
+      if (userMenu.hidden) openUserMenu(); else closeUserMenu();
     });
-    if (cancelBtn) cancelBtn.addEventListener('click', function () { confirmBar.hidden = true; });
-    if (okBtn) {
-      okBtn.addEventListener('click', async function () {
-        try { await fetch(api + 'auth.php?action=logout', { method: 'POST' }); } catch (e) { /* ignore */ }
-        localStorage.removeItem('daily-checkin-dates');
-        localStorage.removeItem('daily-fortune');
-        window.location.reload();
-      });
-    }
     document.addEventListener('mousedown', function (e) {
-      if (userWrap && !userWrap.contains(e.target)) confirmBar.hidden = true;
+      if (userWrap && !userWrap.contains(e.target)) closeUserMenu();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeUserMenu();
+    });
+  }
+
+  if (logoutItem) {
+    logoutItem.addEventListener('click', async function () {
+      try { await fetch(api + 'auth.php?action=logout', { method: 'POST' }); } catch (e) { /* ignore */ }
+      localStorage.removeItem('daily-checkin-dates');
+      localStorage.removeItem('daily-fortune');
+      window.location.reload();
     });
   }
 })();
