@@ -128,7 +128,7 @@ function current_user() {
         $stale = empty($_SESSION['gary_user_time']) || (time() - $_SESSION['gary_user_time'] > 3600);
         if (!$stale) {
             $cached = $_SESSION['gary_user'];
-            $cached['avatar'] = resolve_avatar($cached['avatar'] ?? null, null);
+            $cached['avatar'] = normalize_avatar($cached['avatar'] ?? null);
             return $cached;
         }
         $user = fetch_current_user($_SESSION['gary_token'] ?? '');
@@ -225,66 +225,6 @@ function is_default_avatar($url) {
     return false;
 }
 
-/** 读取头像 Cookie（仅接受与 WordPress 同域的地址） */
-function get_avatar_cookie() {
-    if (empty($_COOKIE['gary_avatar'])) {
-        return null;
-    }
-    $url = normalize_avatar($_COOKIE['gary_avatar']);
-    if (!$url) {
-        return null;
-    }
-    $wpHost = parse_url(WP_BASE, PHP_URL_HOST);
-    $host = parse_url($url, PHP_URL_HOST);
-    if ($wpHost && $host && strcasecmp($wpHost, $host) === 0) {
-        return $url;
-    }
-    return null;
-}
-
-/** 写入头像 Cookie（仅保存与 WordPress 同域的地址） */
-function set_avatar_cookie($url) {
-    $url = normalize_avatar($url);
-    if (!$url) {
-        return;
-    }
-    $wpHost = parse_url(WP_BASE, PHP_URL_HOST);
-    $host = parse_url($url, PHP_URL_HOST);
-    if (!$wpHost || !$host || strcasecmp($wpHost, $host) !== 0) {
-        return;
-    }
-    setcookie('gary_avatar', $url, [
-        'expires'  => time() + TOKEN_TTL,
-        'domain'   => COOKIE_DOMAIN,
-        'path'     => '/',
-        'secure'   => true,
-        'httponly' => true,
-        'samesite' => 'Lax',
-    ]);
-}
-
-/**
- * 头像兜底：优先返回非默认头像
- * @param mixed $fetched  本次接口返回的头像
- * @param mixed $previous 之前保存的头像
- * @return string|null
- */
-function resolve_avatar($fetched, $previous = null) {
-    $fetched = normalize_avatar($fetched);
-    if (!is_default_avatar($fetched)) {
-        return $fetched;
-    }
-    $previous = normalize_avatar($previous);
-    if (!is_default_avatar($previous)) {
-        return $previous;
-    }
-    $cookie = get_avatar_cookie();
-    if ($cookie) {
-        return $cookie;
-    }
-    return $fetched;
-}
-
 /**
  * 通过 token 拉取当前用户
  * @return array|null ['id','name','slug','avatar']
@@ -310,8 +250,8 @@ function fetch_current_user($token) {
     if (!empty($slaAvatar)) {
         $avatar = $slaAvatar;
     } else {
-        // 回退：avatar_urls（Gravatar）→ 会话/Cookie 缓存 → 媒体库匹配
-        $avatar = resolve_avatar($data['avatar_urls'] ?? null, $_SESSION['gary_user']['avatar'] ?? null);
+        // 回退：仅使用当前用户自己的数据（avatar_urls → 按当前用户 ID 匹配媒体库）
+        $avatar = normalize_avatar($data['avatar_urls'] ?? null);
         if (is_default_avatar($avatar)) {
             $custom = fetch_custom_avatar($data['id'], $token);
             if ($custom) {

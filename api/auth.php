@@ -56,9 +56,6 @@ switch ($action) {
             // /wp/v2/users/me 的 avatar_urls 基于邮箱，拿不到自定义头像时改用登录接口的
             $user['avatar'] = $loginAvatar;
         }
-        if (!is_default_avatar($user['avatar'] ?? null)) {
-            set_avatar_cookie($user['avatar']); // 跨会话保留自定义头像
-        }
         $_SESSION['gary_user'] = $user;
         $_SESSION['gary_user_time'] = time();
         json_out(['user' => $user]);
