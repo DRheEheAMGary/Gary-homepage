@@ -105,32 +105,6 @@ switch ($action) {
         clear_token();
         json_out(['ok' => true]);
 
-    // 临时诊断：查看当前登录用户在 WordPress 侧的头像相关字段
-    case 'debug':
-        if (!is_logged_in()) {
-            json_out(['message' => '未登录'], 401);
-        }
-        $token = current_token();
-        list(, $view) = wp_request('GET', WP_USERS_ME_PATH, null, $token);
-        list(, $edit) = wp_request('GET', WP_USERS_ME_PATH . '?context=edit', null, $token);
-        $pick = function ($d) {
-            if (!is_array($d)) {
-                return null;
-            }
-            return [
-                'id'                  => $d['id'] ?? null,
-                'name'                => $d['name'] ?? null,
-                'slug'                => $d['slug'] ?? null,
-                'avatar_urls'         => $d['avatar_urls'] ?? null,
-                'simple_local_avatar' => $d['simple_local_avatar'] ?? null,
-            ];
-        };
-        json_out([
-            'session_user' => $_SESSION['gary_user'] ?? null,
-            'users_me_view' => $pick($view),
-            'users_me_edit' => $pick($edit),
-        ]);
-
     default:
         json_out(['message' => '未知操作'], 404);
 }
