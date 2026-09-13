@@ -109,6 +109,7 @@
     if (!indicator || !tabsWrap) return;
     const activeEl = tabsWrap.querySelector('.auth-tab.active');
     if (!activeEl) { indicator.style.opacity = '0'; return; }
+    indicator.style.opacity = '1';
     const cr = tabsWrap.getBoundingClientRect();
     const br = activeEl.getBoundingClientRect();
     indicator.style.transform = 'translateX(' + (br.left - cr.left) + 'px)';
@@ -129,6 +130,22 @@
   tabButtons.forEach(function (t) {
     t.addEventListener('click', function () { switchMode(t.dataset.authTab); });
   });
+
+  // 登录视图初始为 display:none，测量不到宽度；
+  // 由主页 JS 切换显示后，重新定位橙色滑块（首次直接跳位，不播放过渡）
+  const authWrapper = document.getElementById('auth-wrapper');
+  if (authWrapper && window.MutationObserver) {
+    new MutationObserver(function () {
+      if (authWrapper.hidden) return;
+      if (indicator) indicator.style.transition = 'none';
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          moveIndicator();
+          if (indicator) indicator.style.transition = '';
+        });
+      });
+    }).observe(authWrapper, { attributes: true, attributeFilter: ['hidden'] });
+  }
 
   async function post(action, body) {
     const res = await fetch(api + 'auth.php?action=' + action, {
