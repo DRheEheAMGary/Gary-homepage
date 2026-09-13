@@ -18,6 +18,8 @@
   let manualTimer = null;
   let target = 'home';
   let authOpen = (G.view === 'auth');
+  let wheelLock = false;
+  let wheelUnlockTimer = null;
 
   // ==================== 元素入场动画 ====================
   const LIST_WRAPPERS = [
@@ -155,6 +157,12 @@
     animateScroll(container, top, SCROLL_DURATION, onDone);
   }
 
+  // 滚轮锁：拖动/惯性期间保持锁定，停止后再解锁，避免连续吸附
+  function scheduleWheelUnlock(ms) {
+    clearTimeout(wheelUnlockTimer);
+    wheelUnlockTimer = setTimeout(function () { wheelLock = false; }, (typeof ms === 'number' && ms >= 0) ? ms : 220);
+  }
+
   // ==================== Tab 指示器 ====================
   function moveIndicator() {
     if (!indicator || !tabBar) return;
@@ -276,6 +284,7 @@
       closeAuth(true, G.baseUrl + '#' + id);
 
       manual = true;
+      wheelLock = true;
       target = id;
       setActive(id);
       clearTimeout(manualTimer);
@@ -283,10 +292,88 @@
       scrollToSection(el, function () {
         reveal(el);        // 滚动到位后再播放入场动画
         manual = false;
+        scheduleWheelUnlock();
       });
-      manualTimer = setTimeout(function () { manual = false; }, 1400); // 兜底
+      manualTimer = setTimeout(function () { manual = false; scheduleWheelUnlock(0); }, 1400); // 兜底
     });
   });
+
+  // ==================== 滚轮吸附（自定义缓动，比原生 snap 更慢更柔和） ====================
+  const WHEEL_SNAP_DURATION = 1100;
+
+  // 时长随距离缩放：小距离不拖沓，整屏吸附更从容
+  function wheelDuration(distance) {
+    return Math.max(500, Math.min(WHEEL_SNAP_DURATION, Math.round(distance * 1.3)));
+  }
+
+  function sectionIndexAtTop() {
+    let idx = 0;
+    for (let i = 0; i < sections.length; i++) {
+      if (sections[i].offsetTop <= container.scrollTop + 2) {
+        idx = i;
+      }
+    }
+    return idx;
+  }
+
+  function snapToIndex(i) {
+    i = Math.max(0, Math.min(sections.length - 1, i));
+    const el = sections[i];
+    manual = true;
+    wheelLock = true;
+    target = el.id;
+    setActive(el.id);
+    clearTimeout(manualTimer);
+    el.classList.remove('entered');
+    const distance = Math.abs(el.offsetTop - container.scrollTop);
+    animateScroll(container, el.offsetTop, wheelDuration(distance), function () {
+      reveal(el);
+      manual = false;
+      scheduleWheelUnlock();
+    });
+    manualTimer = setTimeout(function () { manual = false; scheduleWheelUnlock(0); }, WHEEL_SNAP_DURATION + 800);
+  }
+
+  if (container) {
+    container.addEventListener('wheel', function (e) {
+      if (authOpen) return;
+      if (e.ctrlKey || Math.abs(e.deltaY) < 2) return;
+
+      e.preventDefault(); // 完全接管滚轮，避免浏览器原生 snap 的“瞬移”
+      if (wheelLock) {
+        scheduleWheelUnlock();
+        return;
+      }
+      wheelLock = true;
+
+      const dir = e.deltaY > 0 ? 1 : -1;
+      const idx = sectionIndexAtTop();
+      const cur = sections[idx];
+      const viewTop = container.scrollTop;
+      const viewBottom = viewTop + container.clientHeight;
+      const curTop = cur.offsetTop;
+      const curBottom = curTop + cur.offsetHeight;
+
+      // 当前分区高于视口时：先在分区内部滚动，避免跳过内容
+      if (dir > 0 && viewBottom < curBottom - 8) {
+        const to = Math.min(curBottom - container.clientHeight, viewTop + container.clientHeight * 0.85);
+        animateScroll(container, to, wheelDuration(Math.abs(to - viewTop)), scheduleWheelUnlock);
+        return;
+      }
+      if (dir < 0 && viewTop > curTop + 8) {
+        const to = Math.max(curTop, viewTop - container.clientHeight * 0.85);
+        animateScroll(container, to, wheelDuration(Math.abs(to - viewTop)), scheduleWheelUnlock);
+        return;
+      }
+
+      const nextIdx = idx + dir;
+      if (nextIdx < 0 || nextIdx >= sections.length) {
+        scheduleWheelUnlock(0); // 已在首/尾，解锁即可
+        return;
+      }
+      snapToIndex(nextIdx);
+    }, { passive: false });
+  }
 
   // ==================== 回到顶部 ====================
   if (backToTop && container) {
