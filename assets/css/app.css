@@ -1243,7 +1243,13 @@ body {
   height: 24px;
   border-radius: 50%;
   object-fit: cover;
+  flex-shrink: 0;
 }
+
+.top-bar-avatar-fallback {
+  font-size: 1.2rem;
+}
+.top-bar-avatar-fallback[hidden] { display: none; }
 
 .top-bar-logout-btn {
   display: flex;

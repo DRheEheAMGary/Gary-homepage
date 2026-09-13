@@ -19,8 +19,17 @@ $activeTab = $activeTab ?? 'home';
     <?php if ($user): ?>
       <div class="top-bar-user-wrap" id="user-wrap">
         <div class="top-bar-login-btn top-bar-user-pill">
-          <?php if (!empty($user['avatar'])): ?>
-            <img src="<?= e($user['avatar']) ?>" alt="" class="top-bar-avatar" />
+          <?php $avatar = $user['avatar'] ?? null; ?>
+          <?php if (!empty($avatar)): ?>
+            <img
+              src="<?= e($avatar) ?>"
+              alt=""
+              class="top-bar-avatar"
+              referrerpolicy="no-referrer"
+              loading="lazy"
+              onerror="this.onerror=null;this.hidden=true;var f=this.nextElementSibling;if(f)f.hidden=false;"
+            />
+            <i class="fa-solid fa-user-circle top-bar-avatar-fallback" hidden></i>
           <?php else: ?>
             <?= fa_icon('fa-user-circle') ?>
           <?php endif; ?>

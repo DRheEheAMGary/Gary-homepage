@@ -60,14 +60,20 @@ function wp_auth($username, $password) {
         return ['ok' => false, 'message' => $data['message'] ?? '用户名或密码错误'];
     }
 
+    $u = $data['user'] ?? [];
+    $avatarRaw = $u['avatar']
+        ?? ($u['avatar_url'] ?? null)
+        ?? ($u['avatar_urls'] ?? null)
+        ?? ($data['avatar'] ?? null);
+
     return [
         'ok'    => true,
         'token' => $data['token'],
         'user'  => [
-            'email'       => $data['user']['email'] ?? null,
-            'name'        => $data['user']['name'] ?? ($data['user']['username'] ?? $username),
-            'slug'        => $data['user']['username'] ?? $username,
-            'avatar'      => $data['user']['avatar'] ?? null,
+            'email'  => $u['email'] ?? null,
+            'name'   => $u['name'] ?? ($u['username'] ?? $username),
+            'slug'   => $u['username'] ?? $username,
+            'avatar' => normalize_avatar($avatarRaw),
         ],
     ];
 }

@@ -119,7 +119,11 @@ function current_user() {
     if (!empty($_SESSION['gary_user'])) {
         $stale = empty($_SESSION['gary_user_time']) || (time() - $_SESSION['gary_user_time'] > 3600);
         if (!$stale) {
-            return $_SESSION['gary_user'];
+            $cached = $_SESSION['gary_user'];
+            if (array_key_exists('avatar', $cached)) {
+                $cached['avatar'] = normalize_avatar($cached['avatar']);
+            }
+            return $cached;
         }
         $user = fetch_current_user($_SESSION['gary_token'] ?? '');
         if ($user) {
@@ -157,6 +161,53 @@ function sanitize_token($token) {
 }
 
 /**
+ * 规范化头像地址
+ * WordPress 可能返回纯 URL、协议相对地址、相对路径，或整段 <img> 标签
+ * @return string|null 可用的绝对 URL，失败返回 null
+ */
+function normalize_avatar($avatar) {
+    if (empty($avatar)) {
+        return null;
+    }
+
+    // 数组形式：优先 96，其次 48，再取第一个
+    if (is_array($avatar)) {
+        $avatar = $avatar['96'] ?? ($avatar['48'] ?? reset($avatar));
+    }
+    if (!is_string($avatar)) {
+        return null;
+    }
+
+    $avatar = trim($avatar);
+    if ($avatar === '') {
+        return null;
+    }
+
+    // 若返回的是 <img ...> 标签，抽取 src
+    if (stripos($avatar, '<img') !== false) {
+        if (preg_match('/\bsrc\s*=\s*["\']([^"\']+)["\']/i', $avatar, $m)) {
+            $avatar = html_entity_decode($m[1], ENT_QUOTES, 'UTF-8');
+        } else {
+            return null;
+        }
+    }
+
+    // 协议相对地址补全
+    if (strpos($avatar, '//') === 0) {
+        $avatar = 'https:' . $avatar;
+    // http 升级为 https，避免 HTTPS 页面混合内容被拦截
+    } elseif (stripos($avatar, 'http://') === 0) {
+        $avatar = 'https://' . substr($avatar, 7);
+    // 相对路径补全为 WordPress 站点地址
+    } elseif (strpos($avatar, '/') === 0) {
+        $parts = parse_url(WP_BASE);
+        $avatar = ($parts['scheme'] ?? 'https') . '://' . ($parts['host'] ?? '') . $avatar;
+    }
+
+    return filter_var($avatar, FILTER_VALIDATE_URL) ? $avatar : null;
+}
+
+/**
  * 通过 token 拉取当前用户
  * @return array|null ['id','name','slug','avatar']
  */
@@ -177,6 +228,6 @@ function fetch_current_user($token) {
         'id'     => $data['id'],
         'name'   => $data['name'] ?? ($data['slug'] ?? ''),
         'slug'   => $data['slug'] ?? '',
-        'avatar' => $data['avatar_urls']['96'] ?? ($data['avatar_urls']['48'] ?? null),
+        'avatar' => normalize_avatar($data['avatar_urls'] ?? null),
     ];
 }
