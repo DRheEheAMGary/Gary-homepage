@@ -24,7 +24,7 @@
     'links-grid', 'contact-cards', 'game-cards', 'character-grid',
     'tag-list', 'feed-list', 'auth-container', 'auth-form-side', 'auth-form'
   ];
-  const PER_ELEM_DELAY = 60;
+  const PER_ELEM_DELAY = 75;
 
   function prepareSection(el) {
     const pageEl = el.querySelector('.page');
@@ -92,7 +92,7 @@
   }
 
   // 自定义缓动滚动：比原生 smooth 更柔和、时长可控
-  const SCROLL_DURATION = 700;
+  const SCROLL_DURATION = 850;
   function easeInOutCubic(t) {
     return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
   }

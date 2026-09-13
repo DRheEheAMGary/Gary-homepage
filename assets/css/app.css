@@ -485,7 +485,7 @@ body {
 
 /* 进入后：播放一次性上浮动画（animation 不覆盖元素自身的 hover transition） */
 .snap-section.entered .animate-el {
-  animation: elFloatUp 0.5s ease-out both;
+  animation: elFloatUp 0.75s cubic-bezier(0.22, 0.61, 0.36, 1) both;
 }
 
 @keyframes elFloatUp {
