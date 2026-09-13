@@ -80,7 +80,7 @@ function wp_auth($username, $password) {
         'user'  => [
             'email'  => $u['email'] ?? null,
             'name'   => $u['name'] ?? ($u['username'] ?? $username),
-            'slug'   => $u['username'] ?? $username,
+            'slug'   => $u['slug'] ?? ($u['username'] ?? $username),
             'avatar' => normalize_avatar($avatarRaw),
         ],
     ];
