@@ -291,6 +291,77 @@ img { max-width: 100%; height: auto; }
 }
 .theme-toggle:active { transform: scale(0.85) rotate(0deg); }
 
+/* ===== 主题切换：悬浮菜单 ===== */
+.theme-picker {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.theme-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 168px;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background: var(--bg-card);
+  backdrop-filter: var(--card-backdrop);
+  -webkit-backdrop-filter: var(--card-backdrop);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow-hover);
+  z-index: 1000;
+  animation: themeMenuIn 0.18s ease;
+}
+
+.theme-menu[hidden] { display: none; }
+
+@keyframes themeMenuIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.theme-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  font-family: inherit;
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.theme-option i {
+  width: 16px;
+  text-align: center;
+}
+
+.theme-option:hover {
+  background: var(--tag-bg);
+  color: var(--primary);
+}
+
+.theme-option.active {
+  background: var(--tag-bg);
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.theme-picker.open .theme-toggle {
+  border-color: var(--primary);
+  box-shadow: 0 0 20px var(--primary);
+}
+
 /* ===== 主题切换：View Transition API 圆形揭开 ===== */
 /* 旧页面快照保持静止，不参与动画 */
 ::view-transition-old(root) {
