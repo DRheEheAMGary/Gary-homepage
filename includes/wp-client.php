@@ -61,10 +61,18 @@ function wp_auth($username, $password) {
     }
 
     $u = $data['user'] ?? [];
-    $avatarRaw = $u['avatar']
-        ?? ($u['avatar_url'] ?? null)
-        ?? ($u['avatar_urls'] ?? null)
-        ?? ($data['avatar'] ?? null);
+    // 优先 Simple Local Avatars（simple_local_avatar.full）
+    $sla = $u['simple_local_avatar'] ?? ($data['simple_local_avatar'] ?? null);
+    $avatarRaw = null;
+    if (is_array($sla)) {
+        $avatarRaw = $sla['96'] ?? ($sla['full'] ?? null);
+    }
+    if (empty($avatarRaw)) {
+        $avatarRaw = $u['avatar']
+            ?? ($u['avatar_url'] ?? null)
+            ?? ($u['avatar_urls'] ?? null)
+            ?? ($data['avatar'] ?? null);
+    }
 
     return [
         'ok'    => true,

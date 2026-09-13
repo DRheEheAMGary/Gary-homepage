@@ -302,12 +302,21 @@ function fetch_current_user($token) {
     if (!$ok || empty($data['id'])) {
         return null;
     }
-    $avatar = resolve_avatar($data['avatar_urls'] ?? null, $_SESSION['gary_user']['avatar'] ?? null);
-    if (is_default_avatar($avatar)) {
-        // 自定义头像插件（uploads/avatars/avatar-{id}-*）兜底
-        $custom = fetch_custom_avatar($data['id'], $token);
-        if ($custom) {
-            $avatar = $custom;
+    // Simple Local Avatars 注册的 REST 字段 simple_local_avatar（含 full / 各尺寸 / media_id）
+    $sla = $data['simple_local_avatar'] ?? null;
+    $slaUrl = is_array($sla) ? ($sla['96'] ?? ($sla['full'] ?? null)) : null;
+    $slaAvatar = normalize_avatar($slaUrl);
+
+    if (!empty($slaAvatar)) {
+        $avatar = $slaAvatar;
+    } else {
+        // 回退：avatar_urls（Gravatar）→ 会话/Cookie 缓存 → 媒体库匹配
+        $avatar = resolve_avatar($data['avatar_urls'] ?? null, $_SESSION['gary_user']['avatar'] ?? null);
+        if (is_default_avatar($avatar)) {
+            $custom = fetch_custom_avatar($data['id'], $token);
+            if ($custom) {
+                $avatar = $custom;
+            }
         }
     }
 
