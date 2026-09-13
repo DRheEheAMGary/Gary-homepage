@@ -112,6 +112,14 @@ function clear_token() {
         'httponly' => false,
         'samesite' => 'Lax',
     ]);
+    setcookie('gary_avatar', '', [
+        'expires'  => time() - 3600,
+        'domain'   => COOKIE_DOMAIN,
+        'path'     => '/',
+        'secure'   => true,
+        'httponly' => true,
+        'samesite' => 'Lax',
+    ]);
 }
 
 /** 当前登录用户；未登录返回 null */
@@ -120,9 +128,7 @@ function current_user() {
         $stale = empty($_SESSION['gary_user_time']) || (time() - $_SESSION['gary_user_time'] > 3600);
         if (!$stale) {
             $cached = $_SESSION['gary_user'];
-            if (array_key_exists('avatar', $cached)) {
-                $cached['avatar'] = normalize_avatar($cached['avatar']);
-            }
+            $cached['avatar'] = resolve_avatar($cached['avatar'] ?? null, null);
             return $cached;
         }
         $user = fetch_current_user($_SESSION['gary_token'] ?? '');
@@ -207,6 +213,78 @@ function normalize_avatar($avatar) {
     return filter_var($avatar, FILTER_VALIDATE_URL) ? $avatar : null;
 }
 
+/** 是否为默认/无效的 Gravatar 头像 */
+function is_default_avatar($url) {
+    if (empty($url) || !is_string($url)) {
+        return true;
+    }
+    // gravatar 地址缺少邮箱 hash（形如 /avatar/?...）即为默认头像
+    if (preg_match('#^https?://[^/]*gravatar\.com/avatar/?(\?|$)#i', $url)) {
+        return true;
+    }
+    return false;
+}
+
+/** 读取头像 Cookie（仅接受与 WordPress 同域的地址） */
+function get_avatar_cookie() {
+    if (empty($_COOKIE['gary_avatar'])) {
+        return null;
+    }
+    $url = normalize_avatar($_COOKIE['gary_avatar']);
+    if (!$url) {
+        return null;
+    }
+    $wpHost = parse_url(WP_BASE, PHP_URL_HOST);
+    $host = parse_url($url, PHP_URL_HOST);
+    if ($wpHost && $host && strcasecmp($wpHost, $host) === 0) {
+        return $url;
+    }
+    return null;
+}
+
+/** 写入头像 Cookie（仅保存与 WordPress 同域的地址） */
+function set_avatar_cookie($url) {
+    $url = normalize_avatar($url);
+    if (!$url) {
+        return;
+    }
+    $wpHost = parse_url(WP_BASE, PHP_URL_HOST);
+    $host = parse_url($url, PHP_URL_HOST);
+    if (!$wpHost || !$host || strcasecmp($wpHost, $host) !== 0) {
+        return;
+    }
+    setcookie('gary_avatar', $url, [
+        'expires'  => time() + TOKEN_TTL,
+        'domain'   => COOKIE_DOMAIN,
+        'path'     => '/',
+        'secure'   => true,
+        'httponly' => true,
+        'samesite' => 'Lax',
+    ]);
+}
+
+/**
+ * 头像兜底：优先返回非默认头像
+ * @param mixed $fetched  本次接口返回的头像
+ * @param mixed $previous 之前保存的头像
+ * @return string|null
+ */
+function resolve_avatar($fetched, $previous = null) {
+    $fetched = normalize_avatar($fetched);
+    if (!is_default_avatar($fetched)) {
+        return $fetched;
+    }
+    $previous = normalize_avatar($previous);
+    if (!is_default_avatar($previous)) {
+        return $previous;
+    }
+    $cookie = get_avatar_cookie();
+    if ($cookie) {
+        return $cookie;
+    }
+    return $fetched;
+}
+
 /**
  * 通过 token 拉取当前用户
  * @return array|null ['id','name','slug','avatar']
@@ -224,10 +302,45 @@ function fetch_current_user($token) {
     if (!$ok || empty($data['id'])) {
         return null;
     }
+    $avatar = resolve_avatar($data['avatar_urls'] ?? null, $_SESSION['gary_user']['avatar'] ?? null);
+    if (is_default_avatar($avatar)) {
+        // 自定义头像插件（uploads/avatars/avatar-{id}-*）兜底
+        $custom = fetch_custom_avatar($data['id'], $token);
+        if ($custom) {
+            $avatar = $custom;
+        }
+    }
+
     return [
         'id'     => $data['id'],
         'name'   => $data['name'] ?? ($data['slug'] ?? ''),
         'slug'   => $data['slug'] ?? '',
-        'avatar' => normalize_avatar($data['avatar_urls'] ?? null),
+        'avatar' => $avatar,
     ];
+}
+
+/**
+ * 从媒体库查找自定义头像（uploads/avatars/avatar-{userId}-*）
+ * 用于 /wp/v2/users/me 仅返回默认 Gravatar 的情况
+ * @return string|null
+ */
+function fetch_custom_avatar($userId, $token) {
+    $userId = (int) $userId;
+    if ($userId <= 0) {
+        return null;
+    }
+    $path = '/wp/v2/media?search=' . rawurlencode('avatar-' . $userId)
+        . '&media_type=image&per_page=100&orderby=date&order=desc';
+    list($ok, $data) = wp_request('GET', $path, null, $token);
+    if (!$ok || !is_array($data)) {
+        return null;
+    }
+    foreach ($data as $item) {
+        $src = $item['source_url'] ?? '';
+        // 精确匹配插件命名：/avatars/avatar-{id}-xxxx.ext
+        if ($src && preg_match('#/avatars/avatar-' . $userId . '-#', $src)) {
+            return normalize_avatar($src);
+        }
+    }
+    return null;
 }
