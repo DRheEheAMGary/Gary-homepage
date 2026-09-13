@@ -68,6 +68,7 @@ Gary-homepage/
 ├── assets/
 │   ├── css/  (colors.css / index.css / app.css)
 │   └── js/   (theme / particles / typewriter / navigation / auth / checkin / github-calendar)
+├── wordpress-plugin/         # 博客端头像接口插件
 └── cache/                    # GitHub 贡献数据缓存（自动生成）
 ```
 
@@ -84,6 +85,16 @@ Gary-homepage/
 | `hooks/useTheme.jsx` | `assets/js/theme.js` |
 | `components/ParticleBackground.jsx` | `assets/js/particles.js` |
 | 其余交互 | `assets/js/*.js` |
+
+## 🧩 WordPress 插件（头像接口）
+
+部分站点的头像由多个插件共同作用（如 Simple Local Avatars 与 One User Avatar），
+导致 WordPress REST 返回的头像并非前台实际显示的那张。本仓库提供一个小插件，
+按用户 ID 返回"实际生效头像"，主页会自动优先使用它。
+
+安装：把 `wordpress-plugin/gary-avatar-api.php` 放到博客的
+`wp-content/plugins/gary-avatar-api/` 目录（或 `wp-content/mu-plugins/`）并启用，无需任何配置。
+主页端接口为 `GET /wp-json/gary/v1/avatar`（需登录）。
 
 ## 🔐 配置
 

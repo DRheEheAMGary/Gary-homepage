@@ -71,6 +71,7 @@ Gary-homepage/
 ├── assets/
 │   ├── css/  (colors.css / index.css / app.css)
 │   └── js/   (theme / particles / typewriter / navigation / auth / checkin / github-calendar)
+├── wordpress-plugin/         # ブログ側アバター API プラグイン
 └── cache/                    # GitHub コントリビューションのキャッシュ（自動生成）
 ```
 
@@ -87,6 +88,17 @@ Gary-homepage/
 | `hooks/useTheme.jsx` | `assets/js/theme.js` |
 | `components/ParticleBackground.jsx` | `assets/js/particles.js` |
 | その他のインタラクション | `assets/js/*.js` |
+
+## 🧩 WordPress プラグイン（アバター API）
+
+サイトによっては複数のアバタープラグイン（Simple Local Avatars と One User Avatar など）が
+併用され、WordPress REST が返すアバターと実際に表示されるアバターが異なることがあります。
+本リポジトリは、ユーザー ID から「実際に有効なアバター」を返す小さなプラグインを同梱しています。
+ホームページ側はこれを自動的に優先します。
+
+インストール：`wordpress-plugin/gary-avatar-api.php` をブログの
+`wp-content/plugins/gary-avatar-api/`（または `wp-content/mu-plugins/`）に配置して有効化するだけです。
+設定は不要。エンドポイント：`GET /wp-json/gary/v1/avatar`（要ログイン）。
 
 ## 🔐 設定
 

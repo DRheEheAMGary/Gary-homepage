@@ -13,6 +13,8 @@ define('CHECKIN_VERIFY_PATH', '/checkin/v1/verify-turnstile');
 define('CHECKIN_DATES_PATH', '/checkin/v1/dates');
 define('CHECKIN_FORTUNE_PATH', '/checkin/v1/fortune');
 define('WP_USERS_ME_PATH', '/wp/v2/users/me');
+// 博客端 Gary Avatar API 插件（wordpress-plugin/gary-avatar-api.php）提供的头像接口
+define('GARY_AVATAR_PATH', '/gary/v1/avatar');
 
 // ==================== 跨子域共享 Cookie ====================
 define('COOKIE_DOMAIN', '.dreamgary.cn');
@@ -31,10 +33,8 @@ define('SITE_URL', 'https://dreamgary.cn');
 
 // ==================== 头像覆盖（可选） ====================
 // 当 WordPress 头像插件返回的 avatar 不正确时，可按用户 ID 指定头像 URL。
-// 键为 WordPress 用户 ID，值为头像图片地址。
-define('AVATAR_OVERRIDES', [
-    1 => 'https://blog.dreamgary.cn/wp-content/uploads/avatars/avatar-1-1784859119.jpeg',
-]);
+// 键为 WordPress 用户 ID，值为头像图片地址。通常留空即可（优先使用 Gary Avatar API）。
+define('AVATAR_OVERRIDES', []);
 
 // ==================== 资源 / 缓存 ====================
 define('CACHE_DIR', __DIR__ . '/cache');

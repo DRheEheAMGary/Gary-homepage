@@ -69,6 +69,7 @@ Gary-homepage/
 ├── assets/
 │   ├── css/  (colors.css / index.css / app.css)
 │   └── js/   (theme / particles / typewriter / navigation / auth / checkin / github-calendar)
+├── wordpress-plugin/         # Blog-side avatar API plugin
 └── cache/                    # GitHub contribution cache (auto-generated)
 ```
 
@@ -85,6 +86,17 @@ Gary-homepage/
 | `hooks/useTheme.jsx` | `assets/js/theme.js` |
 | `components/ParticleBackground.jsx` | `assets/js/particles.js` |
 | Other interactions | `assets/js/*.js` |
+
+## 🧩 WordPress Plugin (Avatar API)
+
+On some sites the avatar is provided by multiple plugins at once (e.g. Simple Local
+Avatars and One User Avatar), so the WordPress REST avatar may differ from the one
+actually shown on the site. This repo ships a small plugin that returns the
+"effective" avatar by user ID; the homepage prefers it automatically.
+
+Install: copy `wordpress-plugin/gary-avatar-api.php` to
+`wp-content/plugins/gary-avatar-api/` (or `wp-content/mu-plugins/`) on the blog and
+activate it. No configuration needed. Endpoint: `GET /wp-json/gary/v1/avatar` (requires login).
 
 ## 🔐 Configuration
 

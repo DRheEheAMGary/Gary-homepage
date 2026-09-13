@@ -68,6 +68,7 @@ Gary-homepage/
 ├── assets/
 │   ├── css/  (colors.css / index.css / app.css)
 │   └── js/   (theme / particles / typewriter / navigation / auth / checkin / github-calendar)
+├── wordpress-plugin/         # 部落格端頭像介面外掛
 └── cache/                    # GitHub 貢獻資料快取（自動產生）
 ```
 
@@ -84,6 +85,16 @@ Gary-homepage/
 | `hooks/useTheme.jsx` | `assets/js/theme.js` |
 | `components/ParticleBackground.jsx` | `assets/js/particles.js` |
 | 其餘互動 | `assets/js/*.js` |
+
+## 🧩 WordPress 外掛（頭像 API）
+
+部分網站的頭像由多個外掛共同作用（如 Simple Local Avatars 與 One User Avatar），
+導致 WordPress REST 回傳的頭像並非前台實際顯示的那張。本倉庫提供一個小外掛，
+依使用者 ID 回傳「實際生效頭像」，主頁會自動優先使用它。
+
+安裝：將 `wordpress-plugin/gary-avatar-api.php` 放到部落格的
+`wp-content/plugins/gary-avatar-api/`（或 `wp-content/mu-plugins/`）並啟用，無需任何設定。
+主頁端介面為 `GET /wp-json/gary/v1/avatar`（需登入）。
 
 ## 🔐 設定
 

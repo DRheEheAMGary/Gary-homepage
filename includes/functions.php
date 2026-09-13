@@ -227,15 +227,28 @@ function fetch_current_user($token) {
     if (!$ok || empty($data['id'])) {
         return null;
     }
-    // Simple Local Avatars 注册的 REST 字段 simple_local_avatar（含 full / 各尺寸 / media_id）
-    $sla = $data['simple_local_avatar'] ?? null;
-    $slaUrl = is_array($sla) ? ($sla['96'] ?? ($sla['full'] ?? null)) : null;
-    $slaAvatar = normalize_avatar($slaUrl);
+    $avatar = null;
 
-    // 只使用当前用户自己的数据，绝不回退到 Cookie / 其它账号
-    $avatar = !empty($slaAvatar) ? $slaAvatar : normalize_avatar($data['avatar_urls'] ?? null);
+    // 1) 首选：博客端 Gary Avatar API 插件按用户 ID 计算出的"实际生效头像"
+    //    兼容 Simple Local Avatars / One User Avatar 等任意头像插件
+    list($avatarOk, $avatarData) = wp_request('GET', GARY_AVATAR_PATH, null, $token);
+    if ($avatarOk && !empty($avatarData['avatar'])) {
+        $avatar = normalize_avatar($avatarData['avatar']);
+    }
 
-    // 手动覆盖（当 WordPress 侧头像与站点实际显示不一致时，见 config.php 的 AVATAR_OVERRIDES）
+    // 2) 回退：Simple Local Avatars 注册的 REST 字段 simple_local_avatar（含 full / 各尺寸）
+    if (empty($avatar)) {
+        $sla = $data['simple_local_avatar'] ?? null;
+        $slaUrl = is_array($sla) ? ($sla['96'] ?? ($sla['full'] ?? null)) : null;
+        $avatar = normalize_avatar($slaUrl);
+    }
+
+    // 3) 回退：WordPress 自带的 avatar_urls
+    if (empty($avatar)) {
+        $avatar = normalize_avatar($data['avatar_urls'] ?? null);
+    }
+
+    // 4) 手动覆盖（可选，见 config.php 的 AVATAR_OVERRIDES）
     if (defined('AVATAR_OVERRIDES') && is_array(AVATAR_OVERRIDES) && isset(AVATAR_OVERRIDES[(int) $data['id']])) {
         $override = normalize_avatar(AVATAR_OVERRIDES[(int) $data['id']]);
         if ($override) {
