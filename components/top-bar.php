@@ -19,8 +19,9 @@ $activeTab = $activeTab ?? 'home';
     <?php if ($user): ?>
       <?php
         $avatar = $user['avatar'] ?? null;
+        // 用 WordPress 的 user_nicename（slug），即个人主页 /user/{nicename}/ 的规范形式
         $profileSlug = !empty($user['slug']) ? $user['slug'] : ($user['name'] ?? '');
-        $profileUrl = rtrim(BLOG_USER_URL, '/') . '/' . rawurlencode($profileSlug);
+        $profileUrl = rtrim(BLOG_USER_URL, '/') . '/' . rawurlencode($profileSlug) . '/';
       ?>
       <div class="top-bar-user-wrap" id="user-wrap">
         <button
