@@ -234,10 +234,7 @@ function fetch_current_user($token) {
     if ($token === '') {
         return null;
     }
-    list($ok) = wp_request('POST', JWT_VALIDATE_PATH, null, $token);
-    if (!$ok) {
-        return null;
-    }
+    // users/me 会自行校验 token，无需再单独调用 validate（部分站点没有该端点）
     list($ok, $data) = wp_request('GET', WP_USERS_ME_PATH, null, $token);
     if (!$ok || empty($data['id'])) {
         return null;
@@ -247,18 +244,8 @@ function fetch_current_user($token) {
     $slaUrl = is_array($sla) ? ($sla['96'] ?? ($sla['full'] ?? null)) : null;
     $slaAvatar = normalize_avatar($slaUrl);
 
-    if (!empty($slaAvatar)) {
-        $avatar = $slaAvatar;
-    } else {
-        // 回退：仅使用当前用户自己的数据（avatar_urls → 按当前用户 ID 匹配媒体库）
-        $avatar = normalize_avatar($data['avatar_urls'] ?? null);
-        if (is_default_avatar($avatar)) {
-            $custom = fetch_custom_avatar($data['id'], $token);
-            if ($custom) {
-                $avatar = $custom;
-            }
-        }
-    }
+    // 只使用当前用户自己的数据，绝不回退到 Cookie / 其它账号
+    $avatar = !empty($slaAvatar) ? $slaAvatar : normalize_avatar($data['avatar_urls'] ?? null);
 
     return [
         'id'     => $data['id'],
@@ -266,30 +253,4 @@ function fetch_current_user($token) {
         'slug'   => $data['slug'] ?? '',
         'avatar' => $avatar,
     ];
-}
-
-/**
- * 从媒体库查找自定义头像（uploads/avatars/avatar-{userId}-*）
- * 用于 /wp/v2/users/me 仅返回默认 Gravatar 的情况
- * @return string|null
- */
-function fetch_custom_avatar($userId, $token) {
-    $userId = (int) $userId;
-    if ($userId <= 0) {
-        return null;
-    }
-    $path = '/wp/v2/media?search=' . rawurlencode('avatar-' . $userId)
-        . '&media_type=image&per_page=100&orderby=date&order=desc';
-    list($ok, $data) = wp_request('GET', $path, null, $token);
-    if (!$ok || !is_array($data)) {
-        return null;
-    }
-    foreach ($data as $item) {
-        $src = $item['source_url'] ?? '';
-        // 精确匹配插件命名：/avatars/avatar-{id}-xxxx.ext
-        if ($src && preg_match('#/avatars/avatar-' . $userId . '-#', $src)) {
-            return normalize_avatar($src);
-        }
-    }
-    return null;
 }

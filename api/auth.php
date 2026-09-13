@@ -43,18 +43,15 @@ switch ($action) {
         }
 
         store_token($result['token']);
-        $loginAvatar = normalize_avatar($result['user']['avatar'] ?? null); // 登录接口基于用户 ID，可取到自定义头像
         $user = fetch_current_user($result['token']);
         if (!$user) {
+            // 仅当无法读取用户信息时，才退回登录接口返回的字段
             $user = [
                 'id'     => null,
                 'name'   => $result['user']['name'],
                 'slug'   => $result['user']['slug'],
-                'avatar' => $loginAvatar,
+                'avatar' => normalize_avatar($result['user']['avatar'] ?? null),
             ];
-        } elseif (is_default_avatar($user['avatar'] ?? null) && !is_default_avatar($loginAvatar)) {
-            // /wp/v2/users/me 的 avatar_urls 基于邮箱，拿不到自定义头像时改用登录接口的
-            $user['avatar'] = $loginAvatar;
         }
         $_SESSION['gary_user'] = $user;
         $_SESSION['gary_user_time'] = time();
@@ -107,6 +104,32 @@ switch ($action) {
     case 'logout':
         clear_token();
         json_out(['ok' => true]);
+
+    // 临时诊断：查看当前登录用户在 WordPress 侧的头像相关字段
+    case 'debug':
+        if (!is_logged_in()) {
+            json_out(['message' => '未登录'], 401);
+        }
+        $token = current_token();
+        list(, $view) = wp_request('GET', WP_USERS_ME_PATH, null, $token);
+        list(, $edit) = wp_request('GET', WP_USERS_ME_PATH . '?context=edit', null, $token);
+        $pick = function ($d) {
+            if (!is_array($d)) {
+                return null;
+            }
+            return [
+                'id'                  => $d['id'] ?? null,
+                'name'                => $d['name'] ?? null,
+                'slug'                => $d['slug'] ?? null,
+                'avatar_urls'         => $d['avatar_urls'] ?? null,
+                'simple_local_avatar' => $d['simple_local_avatar'] ?? null,
+            ];
+        };
+        json_out([
+            'session_user' => $_SESSION['gary_user'] ?? null,
+            'users_me_view' => $pick($view),
+            'users_me_edit' => $pick($edit),
+        ]);
 
     default:
         json_out(['message' => '未知操作'], 404);
