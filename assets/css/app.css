@@ -6,7 +6,7 @@
 html { scroll-behavior: smooth; font-size: 16px; }
 
 body {
-  font-family: 'Ubuntu', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
+  font-family: 'boxmoe', 'Microsoft JhengHei', Georgia, Times, serif, 'Microsoft YaHei', 'Open Sans', sans-serif;
   background: var(--bg);
   color: var(--text);
   line-height: 1.6;

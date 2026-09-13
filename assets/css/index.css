@@ -1,4 +1,11 @@
 /* index.css - Global Reset */
+/* 博客同款字体（阿里妈妈字体，来自 lolimeow 主题 boxmoe） */
+@font-face {
+  font-family: 'boxmoe';
+  src: url('../fonts/alimama.woff2') format('woff2');
+  font-display: swap;
+}
+
 *,
 *::before,
 *::after {
@@ -13,7 +20,7 @@ html {
 }
 
 body {
-  font-family: 'Ubuntu', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
+  font-family: 'boxmoe', 'Microsoft JhengHei', Georgia, Times, serif, 'Microsoft YaHei', 'Open Sans', sans-serif;
   line-height: 1.6;
   overflow: hidden;
   -webkit-font-smoothing: antialiased;
