@@ -193,9 +193,6 @@
     tabs.forEach(function (t) {
       t.classList.toggle('active', t.dataset.section === id);
     });
-    Array.prototype.forEach.call(document.querySelectorAll('.nav-menu-item'), function (m) {
-      m.classList.toggle('active', m.dataset.section === id);
-    });
     moveIndicator();
   }
 
@@ -304,42 +301,7 @@
     });
   });
 
-  // ==================== 窄屏汉堡菜单 ====================
-  const burger = document.getElementById('nav-burger');
-  const navMenu = document.getElementById('nav-menu');
 
-  function closeNavMenu() {
-    if (navMenu) navMenu.hidden = true;
-    if (burger) burger.setAttribute('aria-expanded', 'false');
-  }
-
-  if (burger && navMenu) {
-    burger.addEventListener('click', function (e) {
-      e.stopPropagation();
-      if (navMenu.hidden) {
-        navMenu.hidden = false;
-        burger.setAttribute('aria-expanded', 'true');
-      } else {
-        closeNavMenu();
-      }
-    });
-    document.addEventListener('mousedown', function (e) {
-      if (!navMenu.hidden && !navMenu.contains(e.target) && !burger.contains(e.target)) {
-        closeNavMenu();
-      }
-    });
-    document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape') closeNavMenu();
-    });
-  }
-
-  Array.prototype.forEach.call(document.querySelectorAll('.nav-menu-item'), function (item) {
-    item.addEventListener('click', function (e) {
-      e.preventDefault();
-      closeNavMenu();
-      navigateTo(item.dataset.section);
-    });
-  });
 
   // ==================== 滚轮吸附（自定义缓动，比原生 snap 更慢更柔和） ====================
   const WHEEL_SNAP_DURATION = 950;
