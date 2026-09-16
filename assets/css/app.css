@@ -329,6 +329,10 @@ img { max-width: 100%; height: auto; }
 }
 
 @media (max-width: 1024px) {
+  /* 收进汉堡后只有左右两栏，避免多出一个空的 1fr 列（右侧留白） */
+  .top-bar {
+    grid-template-columns: 1fr auto;
+  }
   .top-bar .tab-bar { display: none; }
   .nav-burger { display: flex; }
 }

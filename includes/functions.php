@@ -38,9 +38,15 @@ function base_url($path = '') {
     return $base . '/' . ltrim($path, '/');
 }
 
-/** 资源 URL */
+/**
+ * 资源 URL
+ * 附加文件修改时间作为版本号，便于刷新浏览器/CDN 缓存
+ */
 function asset($path) {
-    return base_url('assets/' . ltrim($path, '/'));
+    $path = ltrim($path, '/');
+    $file = __DIR__ . '/../assets/' . $path;
+    $ver  = is_file($file) ? filemtime($file) : null;
+    return base_url('assets/' . $path) . ($ver ? '?v=' . $ver : '');
 }
 
 /** 图标：默认 Font Awesome Solid，知名品牌使用 Brands */
