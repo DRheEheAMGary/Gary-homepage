@@ -268,6 +268,71 @@ img { max-width: 100%; height: auto; }
 }
 .site-subtitle { color: var(--text-secondary); font-size: 0.85rem; white-space: nowrap; transition: color 0.3s ease; }
 
+/* ===== 窄屏汉堡菜单 ===== */
+.nav-burger {
+  display: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  background: transparent;
+  color: var(--primary);
+  font-size: 1rem;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.35s cubic-bezier(0.22, 0.61, 0.36, 1);
+  font-family: inherit;
+}
+.nav-burger:hover {
+  border-color: var(--primary);
+  box-shadow: 0 0 20px var(--primary);
+}
+
+.nav-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background: var(--bg-card);
+  backdrop-filter: var(--card-backdrop);
+  -webkit-backdrop-filter: var(--card-backdrop);
+  border-bottom: 1px solid var(--border);
+  box-shadow: var(--shadow-hover);
+  z-index: 1000;
+  animation: themeMenuIn 0.18s ease;
+}
+.nav-menu[hidden] { display: none; }
+
+.nav-menu-item {
+  display: block;
+  padding: 12px 16px;
+  border-radius: 10px;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  text-decoration: none;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+.nav-menu-item:hover {
+  background: var(--tag-bg);
+  color: var(--primary);
+}
+.nav-menu-item.active {
+  background: var(--tag-bg);
+  color: var(--primary);
+  font-weight: 600;
+}
+
+@media (max-width: 1024px) {
+  .top-bar .tab-bar { display: none; }
+  .nav-burger { display: flex; }
+}
+
 /* ===== 主题切换按钮 ===== */
 .theme-toggle {
   width: 36px; height: 36px;

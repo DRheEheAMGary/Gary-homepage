@@ -193,6 +193,9 @@
     tabs.forEach(function (t) {
       t.classList.toggle('active', t.dataset.section === id);
     });
+    Array.prototype.forEach.call(document.querySelectorAll('.nav-menu-item'), function (m) {
+      m.classList.toggle('active', m.dataset.section === id);
+    });
     moveIndicator();
   }
 
@@ -273,28 +276,68 @@
   }
 
   // ==================== Tab 点击 ====================
+  function navigateTo(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+
+    // 从登录页返回：关闭登录视图，滑块从登录按钮滑向目标 tab
+    closeAuth(true, G.baseUrl + '#' + id);
+
+    manual = true;
+    wheelLock = true;
+    target = id;
+    setActive(id);
+    clearTimeout(manualTimer);
+    el.classList.remove('entered'); // 滚动期间先隐藏目标，到位后再入场
+    scrollToSection(el, function () {
+      reveal(el);        // 滚动到位后再播放入场动画
+      manual = false;
+      scheduleWheelUnlock();
+    });
+    manualTimer = setTimeout(function () { manual = false; scheduleWheelUnlock(0); }, 1400); // 兜底
+  }
+
   tabs.forEach(function (tab) {
     tab.addEventListener('click', function (e) {
       e.preventDefault();
-      const id = tab.dataset.section;
-      const el = document.getElementById(id);
-      if (!el) return;
+      navigateTo(tab.dataset.section);
+    });
+  });
 
-      // 从登录页返回：关闭登录视图，滑块从登录按钮滑向目标 tab
-      closeAuth(true, G.baseUrl + '#' + id);
+  // ==================== 窄屏汉堡菜单 ====================
+  const burger = document.getElementById('nav-burger');
+  const navMenu = document.getElementById('nav-menu');
 
-      manual = true;
-      wheelLock = true;
-      target = id;
-      setActive(id);
-      clearTimeout(manualTimer);
-      el.classList.remove('entered'); // 滚动期间先隐藏目标，到位后再入场
-      scrollToSection(el, function () {
-        reveal(el);        // 滚动到位后再播放入场动画
-        manual = false;
-        scheduleWheelUnlock();
-      });
-      manualTimer = setTimeout(function () { manual = false; scheduleWheelUnlock(0); }, 1400); // 兜底
+  function closeNavMenu() {
+    if (navMenu) navMenu.hidden = true;
+    if (burger) burger.setAttribute('aria-expanded', 'false');
+  }
+
+  if (burger && navMenu) {
+    burger.addEventListener('click', function (e) {
+      e.stopPropagation();
+      if (navMenu.hidden) {
+        navMenu.hidden = false;
+        burger.setAttribute('aria-expanded', 'true');
+      } else {
+        closeNavMenu();
+      }
+    });
+    document.addEventListener('mousedown', function (e) {
+      if (!navMenu.hidden && !navMenu.contains(e.target) && !burger.contains(e.target)) {
+        closeNavMenu();
+      }
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeNavMenu();
+    });
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('.nav-menu-item'), function (item) {
+    item.addEventListener('click', function (e) {
+      e.preventDefault();
+      closeNavMenu();
+      navigateTo(item.dataset.section);
     });
   });
 

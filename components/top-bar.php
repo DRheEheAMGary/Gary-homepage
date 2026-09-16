@@ -16,6 +16,9 @@ $activeTab = $activeTab ?? 'home';
   <?php include __DIR__ . '/tab-bar.php'; ?>
 
   <div class="top-bar-right">
+    <button class="nav-burger" id="nav-burger" type="button" aria-label="菜单" aria-expanded="false">
+      <?= fa_icon('fa-bars') ?>
+    </button>
     <?php if ($user): ?>
       <?php
         $avatar = $user['avatar'] ?? null;
@@ -71,4 +74,16 @@ $activeTab = $activeTab ?? 'home';
 
     <?php include __DIR__ . '/theme-toggle.php'; ?>
   </div>
+
+  <?php // 窄屏汉堡菜单：复用 tab-bar.php 定义的 $tabs ?>
+  <nav class="nav-menu" id="nav-menu" hidden>
+    <?php foreach ($tabs as $tab): ?>
+      <a
+        class="nav-menu-item"
+        role="menuitem"
+        data-section="<?= e($tab['id']) ?>"
+        href="<?= e(base_url('')) ?>#<?= e($tab['id']) ?>"
+      ><?= e($tab['label']) ?></a>
+    <?php endforeach; ?>
+  </nav>
 </div>
