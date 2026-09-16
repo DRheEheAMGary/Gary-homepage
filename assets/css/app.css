@@ -63,17 +63,19 @@ img { max-width: 100%; height: auto; }
   flex-direction: row;
   flex-wrap: nowrap;
   flex: 1;
+  min-height: 0; /* 允许子项在 flex 容器内正确收缩，从而内部滚动 */
   width: 100%;
   max-width: 90%;
   margin: 0;
   padding: 0 20px;
 }
 
-/* ===== 滚动吸附容器 ===== */
+/* ===== 滚动吸附容器（用 flex 填充剩余高度，兼容任意顶栏高度） ===== */
 .snap-container {
   flex: 1 1 0%;
   min-width: 0;
-  height: calc(100vh - 69px);
+  min-height: 0;
+  height: auto;
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-width: none;
@@ -88,8 +90,9 @@ img { max-width: 100%; height: auto; }
 .auth-snap-wrapper {
   flex: 1 1 0%;
   min-width: 0;
-  height: calc(100vh - 69px);
-  overflow-y: hidden;
+  min-height: 0;
+  height: auto;
+  overflow-y: auto;
   overflow-x: hidden;
   position: relative;
   z-index: 1;
@@ -1220,7 +1223,7 @@ body {
   .tab-item { padding: 8px 14px; font-size: 0.82rem; }
   .page { padding: 20px 16px; }
   .snap-section { padding: 20px 16px; min-height: auto; }
-  .snap-container { height: auto; overflow-y: visible; scroll-snap-type: none; }
+  .snap-container { scroll-snap-type: none; }
   .game-cards { grid-template-columns: 1fr; }
   .quick-stats { flex-direction: column; align-items: center; }
   .back-to-top { bottom: 20px; left: 20px; width: 40px; height: 40px; }

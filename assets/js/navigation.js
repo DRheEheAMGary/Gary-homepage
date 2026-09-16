@@ -422,6 +422,31 @@
   }
 
   window.addEventListener('resize', moveIndicator);
+
+  // 跨断点缩放后重新评估各分区可见性，避免内容残留隐藏
+  let resizeTimer = null;
+  window.addEventListener('resize', function () {
+    manual = false;
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function () {
+      const winH = window.innerHeight || document.documentElement.clientHeight;
+      sections.forEach(function (el) {
+        const rect = el.getBoundingClientRect();
+        const inView = rect.top < winH * 0.7 && rect.bottom > winH * 0.3;
+        if (inView) {
+          if (!prepared.has(el)) {
+            prepared.add(el);
+            prepareSection(el);
+          }
+          el.classList.add('entered');
+        } else {
+          el.classList.remove('entered');
+        }
+      });
+      moveIndicator();
+    }, 160);
+  });
+
   window.addEventListener('load', moveIndicator);
   document.addEventListener('DOMContentLoaded', moveIndicator);
   setTimeout(moveIndicator, 300);
