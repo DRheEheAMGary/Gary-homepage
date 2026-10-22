@@ -1,3 +1,5 @@
+Tips: **本仓库以弃用。新的主页仓库源码地址为[Shizuku](https://github.com/DRheEheAMGary/Shizuku)**
+
 # 🏠 Gary 个人主页（PHP 版）
 
 **简体中文** | [繁體中文](README.zh-Hant.md) | [English](README.en.md) | [日本語](README.ja.md)
